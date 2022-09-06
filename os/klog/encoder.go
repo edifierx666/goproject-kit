@@ -11,7 +11,7 @@ func GetDefEncoderCfg() zapcore.EncoderConfig {
   return zapcore.EncoderConfig{
     MessageKey:     "message",
     LevelKey:       "level",
-    TimeKey:        "time",
+    TimeKey:        "timeKey",
     NameKey:        "logger",
     CallerKey:      "caller",
     FunctionKey:    "function",
@@ -33,7 +33,7 @@ func GetDefEncoderCfg() zapcore.EncoderConfig {
       encoder.AppendString(fmt.Sprintf("[%s]", s))
     },
     // 每个属性的分隔符
-    ConsoleSeparator: "",
+    ConsoleSeparator: " ",
   }
 }
 
