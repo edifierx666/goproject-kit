@@ -5,10 +5,10 @@ import (
 
   "github.com/edifierx666/goproject-kit/os/klog/core"
   "github.com/edifierx666/goproject-kit/os/klog/encoder"
+  "github.com/edifierx666/goproject-kit/os/klog/inner"
   "github.com/edifierx666/goproject-kit/os/klog/writesyncer"
   "go.uber.org/zap"
   "go.uber.org/zap/zapcore"
-  "gopkg.in/natefinch/lumberjack.v2"
 )
 
 type Logger struct {
@@ -52,13 +52,7 @@ func createFileCoreWithLoggerCfg(encoderCfg *encoder.KlogEncoder, cfg *LoggerCfg
   fileCore.SetType(cfg.Type)
   fileCore.SetEncoderCfg(encoderCfg)
   fileCore.SetLevel(TransportLevel(cfg.Level))
-  logger := lumberjack.Logger{
-    Filename:   "./log",
-    MaxSize:    100,
-    MaxAge:     100,
-    MaxBackups: 3,
-    Compress:   false,
-  }
+  logger := inner.DefFileLogger()
   if cfg.MaxSize != 0 {
     logger.MaxSize = cfg.MaxSize
   }
@@ -75,7 +69,7 @@ func createFileCoreWithLoggerCfg(encoderCfg *encoder.KlogEncoder, cfg *LoggerCfg
   if cfg.Filename != "" {
     logger.Filename = cfg.Filename
   }
-  fileCore.SetOutput(writesyncer.FileWriteSyncer(&logger))
+  fileCore.SetOutput(writesyncer.FileWriteSyncer(logger))
   return fileCore.Build()
 }
 func createConsoleCoreWithLoggerCfg(encoderCfg *encoder.KlogEncoder, cfg *LoggerCfg) zapcore.Core {
