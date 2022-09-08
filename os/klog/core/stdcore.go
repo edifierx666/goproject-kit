@@ -17,7 +17,7 @@ func NewStdCore(bc ...*BaseCore) *StdCore {
     level:      zapcore.DebugLevel,
     output:     os.Stdout,
   }
-  if len(bc) >= 0 {
+  if len(bc) >= 1 {
     b = bc[0]
   }
   return &StdCore{

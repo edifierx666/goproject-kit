@@ -16,7 +16,7 @@ func NewFileCore(bc ...*BaseCore) *FileCore {
     level:      zapcore.DebugLevel,
     output:     writesyncer.FileWriteSyncer(),
   }
-  if len(bc) >= 0 {
+  if len(bc) >= 1 {
     b = bc[0]
   }
 
