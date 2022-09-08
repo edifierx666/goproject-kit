@@ -39,27 +39,27 @@ func NewLoggerCfg(cfg ...*LoggerCfg) *LoggerCfg {
   return l
 }
 
-func (b *LoggerCfg) WithFilename(filename string) *LoggerCfg {
+func (b *LoggerCfg) SetFilename(filename string) *LoggerCfg {
   b.Filename = filename
   return b
 }
 
-func (b *LoggerCfg) WithMaxSize(maxSize int) *LoggerCfg {
+func (b *LoggerCfg) SetMaxSize(maxSize int) *LoggerCfg {
   b.MaxSize = maxSize
   return b
 }
 
-func (b *LoggerCfg) WithMaxAge(maxAge int) *LoggerCfg {
+func (b *LoggerCfg) SetMaxAge(maxAge int) *LoggerCfg {
   b.MaxAge = maxAge
   return b
 }
 
-func (b *LoggerCfg) WithMaxBackups(maxBackups int) *LoggerCfg {
+func (b *LoggerCfg) SetMaxBackups(maxBackups int) *LoggerCfg {
   b.MaxBackups = maxBackups
   return b
 }
 
-func (b *LoggerCfg) WithCompress(compress bool) *LoggerCfg {
+func (b *LoggerCfg) SetCompress(compress bool) *LoggerCfg {
   b.Compress = compress
   return b
 }
