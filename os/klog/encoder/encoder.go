@@ -150,5 +150,5 @@ func DefEncoderCfg() zapcore.EncoderConfig {
 }
 
 func DefaultTimeEncoder(t time.Time, encoder zapcore.PrimitiveArrayEncoder, prefix string) {
-  encoder.AppendString(prefix + t.Format("2006/01/02 15:04:05.000"))
+  encoder.AppendString(prefix + t.Format("2006-01-02 15:04:05.000"))
 }
