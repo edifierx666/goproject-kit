@@ -7,7 +7,7 @@ import (
 
   "github.com/Netflix/go-env"
   "github.com/edifierx666/goproject-kit/os/kcfg"
-  "github.com/edifierx666/goproject-kit/os/klog"
+  "github.com/edifierx666/goproject-kit/os/klog2"
   "go.uber.org/zap"
   "go.uber.org/zap/zapcore"
 )
@@ -24,7 +24,7 @@ func TestName(t *testing.T) {
   fmt.Println(err, envSet, res, environ)
 }
 func TestName1(t *testing.T) {
-  cfg := klog.GetDefEncoderCfg()
+  cfg := klog2.GetDefEncoderCfg()
   file, _ := os.OpenFile("./log.log", os.O_CREATE|os.O_RDWR, os.ModePerm)
   sync := zapcore.AddSync(file)
   core := zapcore.NewCore(zapcore.NewConsoleEncoder(cfg), os.Stdout, zap.NewAtomicLevelAt(zap.DebugLevel))
@@ -39,13 +39,11 @@ func TestName1(t *testing.T) {
 
 }
 func TestName2(t *testing.T) {
-  k := &klog.FileCore{}
+  k := &klog2.FileCore{}
   fmt.Println(k)
 }
 
 func TestName3(t *testing.T) {
-  logger := klog.New(&klog.EasyZapCfg{})
-  logger.Info("???????")
 }
 
 func TestCfg1(t *testing.T) {
