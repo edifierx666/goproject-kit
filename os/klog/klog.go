@@ -97,12 +97,11 @@ func NewLogger(encoderCfg *encoder.KlogEncoder, cfg ...*LoggerCfg) *Logger {
   if loggerCfg.ShowLine {
     logger.WithOptions(zap.AddCaller())
   }
-  l := &Logger{
+  return &Logger{
     Logger:     logger,
     encoderCfg: encoderCfg,
     loggerCfg:  loggerCfg,
   }
-  return l
 }
 func CreateFileCoreWithLoggerCfg(encoderCfg *encoder.KlogEncoder, cfg *LoggerCfg) zapcore.Core {
   fileCore := core.NewFileCore()
