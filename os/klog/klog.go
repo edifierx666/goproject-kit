@@ -17,6 +17,13 @@ type Logger struct {
   loggerCfg  *LoggerCfg
 }
 
+func New() *Logger {
+  return &Logger{
+    Logger:     nil,
+    encoderCfg: encoder.NewKlogEncoderCfg(),
+    loggerCfg:  NewLoggerCfg(),
+  }
+}
 func (l *Logger) SetEncoderCfg(cfg *encoder.KlogEncoder) *Logger {
   l.encoderCfg = cfg
   return l
