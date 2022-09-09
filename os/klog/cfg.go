@@ -39,8 +39,18 @@ func NewLoggerCfg(cfg ...*LoggerCfg) *LoggerCfg {
   return l
 }
 
+func (b *LoggerCfg) New() (cfg *LoggerCfg) {
+  c := *b
+  return &c
+}
+
 func (b *LoggerCfg) SetFilename(filename string) *LoggerCfg {
   b.Filename = filename
+  return b
+}
+
+func (b *LoggerCfg) SetType(t string) *LoggerCfg {
+  b.Type = t
   return b
 }
 

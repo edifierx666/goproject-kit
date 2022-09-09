@@ -17,12 +17,26 @@ type Logger struct {
   loggerCfg  *LoggerCfg
 }
 
+func (l *Logger) SetEncoderCfg(cfg *encoder.KlogEncoder) *Logger {
+  l.encoderCfg = cfg
+  return l
+}
+
+func (l *Logger) SetLoggerCfg(cfg *LoggerCfg) *Logger {
+  l.loggerCfg = cfg
+  return l
+}
+
 func (l *Logger) EncoderCfg() *encoder.KlogEncoder {
   return l.encoderCfg
 }
 
 func (l *Logger) New() *Logger {
-  return NewLogger(l.loggerCfg)
+  return NewLogger(l.encoderCfg, l.loggerCfg)
+}
+
+func (l *Logger) Build() *Logger {
+  return NewLogger(l.encoderCfg, l.loggerCfg)
 }
 
 func (l *Logger) LoggerCfg() *LoggerCfg {
@@ -46,11 +60,13 @@ func (l *Logger) WithOutput(w zapcore.WriteSyncer, encoderCfg ...*encoder.KlogEn
   return l.WithOptions(wrapCore)
 }
 
-func NewLogger(cfg ...*LoggerCfg) *Logger {
+func NewLogger(encoderCfg *encoder.KlogEncoder, cfg ...*LoggerCfg) *Logger {
   loggerCfg := NewLoggerCfg(cfg...)
 
   var cores []zapcore.Core
-  encoderCfg := encoder.NewKlogEncoderCfg()
+  if encoderCfg == nil {
+    encoderCfg = encoder.NewKlogEncoderCfg()
+  }
 
   if loggerCfg.StacktraceKey != "" {
     encoderCfg.StacktraceKey(loggerCfg.StacktraceKey)
