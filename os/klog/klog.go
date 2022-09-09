@@ -21,6 +21,10 @@ func (l *Logger) EncoderCfg() *encoder.KlogEncoder {
   return l.encoderCfg
 }
 
+func (l *Logger) New() *Logger {
+  return NewLogger(l.loggerCfg)
+}
+
 func (l *Logger) LoggerCfg() *LoggerCfg {
   return l.loggerCfg
 }
