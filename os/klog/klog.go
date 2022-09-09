@@ -12,10 +12,37 @@ import (
 )
 
 type Logger struct {
-  zap zap.Logger
+  *zap.Logger
+  encoderCfg *encoder.KlogEncoder
+  loggerCfg  *LoggerCfg
 }
 
-func NewLogger(cfg ...*LoggerCfg) *zap.Logger {
+func (l *Logger) EncoderCfg() *encoder.KlogEncoder {
+  return l.encoderCfg
+}
+
+func (l *Logger) LoggerCfg() *LoggerCfg {
+  return l.loggerCfg
+}
+
+func (l *Logger) WithOutput(w zapcore.WriteSyncer, encoderCfg ...*encoder.KlogEncoder) *zap.Logger {
+  bc := &core.BaseCore{}
+  cfg := l.encoderCfg
+  if len(encoderCfg) >= 1 {
+    cfg = encoderCfg[0]
+  }
+  bc.SetEncoderCfg(cfg)
+  bc.SetType(l.loggerCfg.Type)
+  bc.SetLevel(TransportLevel(l.loggerCfg.Level))
+  bc.SetOutput(w)
+  b := bc.Build()
+  wrapCore := zap.WrapCore(func(z zapcore.Core) zapcore.Core {
+    return zapcore.NewTee(z, b)
+  })
+  return l.WithOptions(wrapCore)
+}
+
+func NewLogger(cfg ...*LoggerCfg) *Logger {
   loggerCfg := NewLoggerCfg(cfg...)
 
   var cores []zapcore.Core
@@ -29,25 +56,28 @@ func NewLogger(cfg ...*LoggerCfg) *zap.Logger {
     encoderCfg.EncodeLevel(ZapEncodeLevel(loggerCfg.EncodeLevel))
   }
   if loggerCfg.LogInConsole {
-    cores = append(cores, createConsoleCoreWithLoggerCfg(encoderCfg, loggerCfg))
+    cores = append(cores, CreateConsoleCoreWithLoggerCfg(encoderCfg, loggerCfg))
   }
 
   if loggerCfg.LogInFile {
-    cores = append(cores, createFileCoreWithLoggerCfg(encoderCfg, loggerCfg))
+    cores = append(cores, CreateFileCoreWithLoggerCfg(encoderCfg, loggerCfg))
   }
 
   if len(cores) == 0 {
     cores = append(cores, zapcore.NewNopCore())
   }
-
   logger := zap.New(zapcore.NewTee(cores...))
   if loggerCfg.ShowLine {
     logger.WithOptions(zap.AddCaller())
   }
-  return logger
+  l := &Logger{
+    Logger:     logger,
+    encoderCfg: encoderCfg,
+    loggerCfg:  loggerCfg,
+  }
+  return l
 }
-
-func createFileCoreWithLoggerCfg(encoderCfg *encoder.KlogEncoder, cfg *LoggerCfg) zapcore.Core {
+func CreateFileCoreWithLoggerCfg(encoderCfg *encoder.KlogEncoder, cfg *LoggerCfg) zapcore.Core {
   fileCore := core.NewFileCore()
   fileCore.SetType(cfg.Type)
   fileCore.SetEncoderCfg(encoderCfg)
@@ -72,7 +102,7 @@ func createFileCoreWithLoggerCfg(encoderCfg *encoder.KlogEncoder, cfg *LoggerCfg
   fileCore.SetOutput(writesyncer.FileWriteSyncer(logger))
   return fileCore.Build()
 }
-func createConsoleCoreWithLoggerCfg(encoderCfg *encoder.KlogEncoder, cfg *LoggerCfg) zapcore.Core {
+func CreateConsoleCoreWithLoggerCfg(encoderCfg *encoder.KlogEncoder, cfg *LoggerCfg) zapcore.Core {
   stdCore := core.NewStdCore()
   stdCore.SetType(cfg.Type)
   stdCore.SetEncoderCfg(encoderCfg)
@@ -93,8 +123,6 @@ func ZapEncodeLevel(levelEncoder string) zapcore.LevelEncoder {
     return zapcore.LowercaseLevelEncoder
   }
 }
-
-// TransportLevel 根据字符串转化为 zapcore.Level
 func TransportLevel(l string) zapcore.Level {
   l = strings.ToLower(l)
   switch l {
