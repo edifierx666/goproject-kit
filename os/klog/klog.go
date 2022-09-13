@@ -1,6 +1,7 @@
 package klog
 
 import (
+  "fmt"
   "strings"
 
   "github.com/edifierx666/goproject-kit/os/klog/core"
@@ -80,7 +81,9 @@ func NewLogger(encoderCfg *encoder.KlogEncoder, cfg ...*LoggerCfg) *Logger {
   }
 
   if loggerCfg.EncodeLevel != "" {
-    encoderCfg.EncodeLevel(ZapEncodeLevel(loggerCfg.EncodeLevel))
+    encoderCfg.EncodeLevel(func(level zapcore.Level, arrayEncoder zapcore.PrimitiveArrayEncoder) {
+      arrayEncoder.AppendString(fmt.Sprintf("[%v]", level.CapitalString()))
+    })
   }
   if loggerCfg.LogInConsole {
     cores = append(cores, CreateConsoleCoreWithLoggerCfg(encoderCfg, loggerCfg))
@@ -149,6 +152,7 @@ func ZapEncodeLevel(levelEncoder string) zapcore.LevelEncoder {
     return zapcore.LowercaseLevelEncoder
   }
 }
+
 func TransportLevel(l string) zapcore.Level {
   l = strings.ToLower(l)
   switch l {
