@@ -13,16 +13,18 @@ type Kcfg struct {
   WatchMode  bool   `json:"watch_mode" yaml:"watch_mode"`
 }
 
-func (k *Kcfg) Build() *Kcfg {
+func (k *Kcfg) Build() (*Kcfg, error) {
+  k.AddConfigPath(".")
   k.SetConfigPath(k.Path)
   k.SetConfigType(k.ConfigType)
   if k.MergeEnv {
     k.Viper.AutomaticEnv()
+    k.Viper.AllowEmptyEnv(true)
   }
   if k.WatchMode {
     k.Viper.WatchConfig()
   }
-  return k
+  return k, k.Update()
 }
 
 func New() *Kcfg {
@@ -56,12 +58,8 @@ func (k *Kcfg) OnConfigChange(fn func(e fsnotify.Event)) *Kcfg {
   return k
 }
 
-func (k *Kcfg) Update() *Kcfg {
-  err := k.Viper.ReadInConfig()
-  if err != nil {
-    panic(err)
-  }
-  return k
+func (k *Kcfg) Update() error {
+  return k.Viper.ReadInConfig()
 }
 
 func (k *Kcfg) ReadAsMap() (error, map[string]interface{}) {
