@@ -1,7 +1,20 @@
 package kvar
 
-import "github.com/gogf/gf/v2/container/gvar"
+import (
+  "github.com/gogf/gf/v2/container/gvar"
+)
 
-func New(val interface{}, safe bool) *gvar.Var {
-  return gvar.New(val, safe)
+type Var struct {
+  *gvar.Var
+}
+
+func New(val interface{}, safe ...bool) *Var {
+  if len(safe) > 0 && !safe[0] {
+    return &Var{
+      Var: gvar.New(val, true),
+    }
+  }
+  return &Var{
+    Var: gvar.New(val),
+  }
 }
