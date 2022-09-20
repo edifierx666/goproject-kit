@@ -17,6 +17,18 @@ func (k *Kcfg) Viper() *viper.Viper {
   return k.viper
 }
 
+func (k *Kcfg) Build() *Kcfg {
+  k.SetConfigPath(k.Path)
+  k.SetConfigType(k.ConfigType)
+  if k.MergeEnv {
+    k.viper.AutomaticEnv()
+  }
+  if k.WatchMode {
+    k.viper.WatchConfig()
+  }
+  return k
+}
+
 func New() *Kcfg {
   kcfg := &Kcfg{
     viper:      viper.New(),
@@ -24,10 +36,6 @@ func New() *Kcfg {
     ConfigType: "yaml",
     WatchMode:  true,
     Path:       "./config.yaml",
-  }
-  kcfg.SetConfigPath(kcfg.Path)
-  if kcfg.WatchMode {
-    kcfg.viper.WatchConfig()
   }
   return kcfg
 }
