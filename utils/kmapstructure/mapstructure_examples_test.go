@@ -10,6 +10,7 @@ func ExampleDecode() {
     Age    int
     Emails []string
     Extra  map[string]string
+    XInfo  string `mapstructure:"x-info"`
   }
 
   // This input can come from anywhere, but typically comes from
@@ -22,6 +23,7 @@ func ExampleDecode() {
     "extra": map[string]string{
       "twitter": "mitchellh",
     },
+    "x-info": "asdasd",
   }
 
   var result Person
