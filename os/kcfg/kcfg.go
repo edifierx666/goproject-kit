@@ -7,13 +7,14 @@ import (
 
 type Kcfg struct {
   *viper.Viper
-  Path       string `json:"path" yaml:"path"`
-  MergeEnv   bool   `json:"merge_env" yaml:"merge_env"`
-  ConfigType string `json:"config_type" yaml:"config_type"`
-  WatchMode  bool   `json:"watch_mode" yaml:"watch_mode"`
+  Path       string                   `json:"path" yaml:"path"`
+  MergeEnv   bool                     `json:"merge_env" yaml:"merge_env"`
+  ConfigType string                   `json:"config_type" yaml:"config_type"`
+  WatchMode  bool                     `json:"watch_mode" yaml:"watch_mode"`
+  ChangeFn   func(isWatchChange bool) `json:"change_fn" yaml:"change_fn"`
 }
 
-func (k *Kcfg) Build() (*Kcfg, error) {
+func (k *Kcfg) Load() (*Kcfg, error) {
   k.AddConfigPath(".")
   k.SetConfigPath(k.Path)
   k.SetConfigType(k.ConfigType)
@@ -24,7 +25,9 @@ func (k *Kcfg) Build() (*Kcfg, error) {
   if k.WatchMode {
     k.Viper.WatchConfig()
   }
-  return k, k.Update()
+  err := k.Update()
+  k.ChangeFn(false)
+  return k, err
 }
 
 func New() *Kcfg {
@@ -34,6 +37,7 @@ func New() *Kcfg {
     ConfigType: "yaml",
     WatchMode:  true,
     Path:       "./config.yaml",
+    ChangeFn:   func(isWatchChange bool) {},
   }
   return kcfg
 }
@@ -54,7 +58,10 @@ func (k *Kcfg) SetConfigType(t string) *Kcfg {
 }
 
 func (k *Kcfg) OnConfigChange(fn func(e fsnotify.Event)) *Kcfg {
-  k.Viper.OnConfigChange(fn)
+  k.Viper.OnConfigChange(func(in fsnotify.Event) {
+    fn(in)
+    k.ChangeFn(true)
+  })
   return k
 }
 
